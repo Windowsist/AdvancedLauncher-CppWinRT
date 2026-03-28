@@ -7,13 +7,14 @@
 // #define WINAPI_FAMILY_GAMES         /* Windows Games and Applications */
 // #define WINAPI_FAMILY_DESKTOP_APP   /* Windows Desktop Applications */
 
-#define WINAPI_FAMILY WINAPI_FAMILY_SYSTEM
+#define WINAPI_FAMILY WINAPI_FAMILY_DESKTOP_APP
 
 #define _CONSOLE
 #define WIN32_LEAN_AND_MEAN
 #define WINRT_LEAN_AND_MEAN
 
 #include <windows.h>
+#include <Shobjidl.h>
 #include <corecrt_startup.h>
 #include <winrt/base.h>
 #include <winrt/Windows.System.h>
@@ -23,3 +24,4 @@
 #include <winrt/Windows.ApplicationModel.Core.h>
 #include <winrt/Windows.Foundation.h>
 #include <winrt/Windows.Foundation.Collections.h>
+#include <winrt/windows.ui.popups.h>

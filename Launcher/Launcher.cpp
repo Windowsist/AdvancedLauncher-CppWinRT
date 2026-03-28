@@ -111,7 +111,9 @@ wWinMain(
 }
 catch (winrt::hresult_error& result_error)
 {
-	FatalAppExitW(0, result_error.message().c_str());
+	auto messageDialog = winrt::Windows::UI::Popups::MessageDialog(result_error.message());
+	messageDialog.as<::IInitializeWithWindow>()->Initialize(GetDesktopWindow());
+	messageDialog.ShowAsync().get();
 	return 0;
 }
 
