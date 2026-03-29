@@ -17,14 +17,14 @@
 # msvcprt.lib -> msvcp_win.lib (extracted from msvcp_win.dll)
 
 # Debug:
-# CPPFLAGS=/nologo /D "_UNICODE" /D "UNICODE" /MD /std:c++17 /EHsc /await /bigobj /utf-8 /Zi
+# CPPFLAGS=/nologo /D "_UNICODE" /D "UNICODE" /MD /std:c++17 /EHsc /bigobj /utf-8 /Zi
 # Release:
-# CPPFLAGS=/nologo /D "_UNICODE" /D "UNICODE" /MD /std:c++17 /EHsc /await /bigobj /utf-8 /O2 /Ob2 /GL
+CPPFLAGS=/nologo /D "_UNICODE" /D "UNICODE" /MD /std:c++17 /EHsc /bigobj /utf-8 /O2 /Ob2 /GL
 
 build: Launcher.exe
 
 Launcher.exe: pch.pch pch.obj Launcher.cpp
-	$(CPP) $(CPPFLAGS) /Yu"pch.h" /Fp: "pch.pch" Launcher.cpp /link pch.obj /NODEFAULTLIB:msvcrt.lib store/msvcrt.lib WindowsApp.lib
+	$(CPP) $(CPPFLAGS) /Yu"pch.h" /Fp: "pch.pch" Launcher.cpp /link pch.obj /NODEFAULTLIB:vcruntime.lib api-ms-win-crt-private-l1-1-0.lib api-ms-win-crt-string-l1-1-0.lib msvcp_win.lib user32.lib WindowsApp.lib
 
 pch.pch: pch.h pch.cpp
 	$(CPP) $(CPPFLAGS) /c /Yc"pch.h" /Fp: "pch.pch" pch.cpp
