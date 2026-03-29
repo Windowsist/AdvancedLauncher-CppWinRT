@@ -19,7 +19,7 @@
 # Debug:
 # CPPFLAGS=/nologo /D "_UNICODE" /D "UNICODE" /MD /std:c++17 /EHsc /bigobj /utf-8 /Zi
 # Release:
-CPPFLAGS=/nologo /D "_UNICODE" /D "UNICODE" /MD /std:c++17 /EHsc /bigobj /utf-8 /O2 /Ob2 /GL
+# CPPFLAGS=/nologo /D "_UNICODE" /D "UNICODE" /MD /std:c++17 /EHsc /bigobj /utf-8 /O2 /Ob2 /GL
 
 build: Launcher.exe
 
