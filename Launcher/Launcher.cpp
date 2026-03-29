@@ -27,20 +27,19 @@ wWinMain(
 		::SetEnvironmentVariableW(L"LauncherDir", nullptr);
 		if (__argc > 1)
 		{
-			auto procinfoauto = PROCESS_INFORMATIONauto([](wchar_t** argv, LPWSTR lpCmdLine) ->PROCESS_INFORMATION
-				{
-					PROCESS_INFORMATION processInfo;
-					STARTUPINFOW startupInfo{ sizeof(STARTUPINFOW) };
-					if (!CreateProcessW(argv[1],
-						lpCmdLine,
-						nullptr, nullptr, FALSE, 0UL, nullptr,
-						winrt::Windows::Storage::StorageFile::GetFileFromPathAsync(argv[1]).get().GetParentAsync().get().Path().c_str(),
-						&startupInfo, &processInfo))
-					{
-						winrt::throw_last_error();
-					}
-					return processInfo;
-				}(__wargv, lpCmdLine));
+			wchar_t** argv = __wargv;
+			PROCESS_INFORMATION processInfo;
+			STARTUPINFOW startupInfo{ sizeof(STARTUPINFOW) };
+			if (!CreateProcessW(argv[1],
+				lpCmdLine,
+				nullptr, nullptr, FALSE, 0UL, nullptr,
+				winrt::Windows::Storage::StorageFile::GetFileFromPathAsync(argv[1]).get().GetParentAsync().get().Path().c_str(),
+				&startupInfo, &processInfo))
+			{
+				winrt::throw_last_error();
+			}
+			auto hProcess = winrt::handle(processInfo.hProcess);
+			auto hThread = winrt::handle(processInfo.hThread);
 			return 0;
 		}
 		auto launches = jsonObj.GetNamedArray(L"LaunchApps");
@@ -57,7 +56,8 @@ wWinMain(
 					auto env = envs.GetObjectAt(i2);
 					SetEnvironmentVariableW(env.GetNamedString(L"Variable").c_str(), expenv(env.GetNamedString(L"Value")).c_str());
 				}
-				auto procinfoauto = PROCESS_INFORMATIONauto([](auto& launch) ->PROCESS_INFORMATION
+				struct ProcessInformation { winrt::handle hProcess; winrt::handle hThread; };
+				auto procinfoauto = ProcessInformation([](auto& launch) ->ProcessInformation
 					{
 						PROCESS_INFORMATION processInfo;
 						STARTUPINFOW startupInfo{ sizeof(STARTUPINFOW) };
@@ -70,7 +70,7 @@ wWinMain(
 						{
 							winrt::throw_last_error();
 						}
-						return processInfo;
+						return { winrt::handle(processInfo.hProcess),winrt::handle(processInfo.hThread) };
 					}(launch));
 				::SetEnvironmentVariableW(L"LauncherDir", nullptr);
 				for (uint32_t i2 = 0U, count2 = envs.Size(); i2 < count2; i2++)
@@ -79,7 +79,7 @@ wWinMain(
 				}
 				if (launch.GetNamedBoolean(L"Wait"))
 				{
-					if (::WaitForSingleObject(procinfoauto.data.hProcess, INFINITE) == WAIT_FAILED)
+					if (::WaitForSingleObject(procinfoauto.hProcess.get(), INFINITE) == WAIT_FAILED)
 					{
 						winrt::throw_last_error();
 					}
@@ -155,14 +155,4 @@ wWinMain(
 		}
 		::lstrcpyW(buffer + ::lstrlenW(buffer) - 3, L"json");
 		return { buffer };
-	}
-
-	PROCESS_INFORMATIONauto::PROCESS_INFORMATIONauto(const PROCESS_INFORMATION procinfo) :data(procinfo)
-	{
-	}
-
-	PROCESS_INFORMATIONauto::~PROCESS_INFORMATIONauto()
-	{
-		::CloseHandle(data.hProcess);
-		::CloseHandle(data.hThread);
 	}
